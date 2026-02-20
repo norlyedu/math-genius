@@ -9,6 +9,7 @@
     <style>
         body {
             font-family: Calibri, 'Candara', 'Segoe UI', 'Optima', Arial, sans-serif;
+            background-color: #f3f4f6;
         }
 
         @page {
@@ -17,18 +18,15 @@
         }
 
         @media print {
-            .no-print, aside, button, .sidebar-fixed { 
+            .no-print { 
                 display: none !important; 
             }
             
             body { 
                 background: white !important; 
-                margin: 0 !important;
-                padding: 0 !important;
             }
 
             .main-content {
-                margin: 0 !important;
                 padding: 0 !important;
                 display: block !important;
                 width: 100% !important;
@@ -40,6 +38,7 @@
                 border: none !important; 
                 box-shadow: none !important; 
                 width: 100% !important;
+                transform: none !important;
             }
             
             .question-box {
@@ -47,34 +46,38 @@
                 page-break-inside: avoid;
                 margin-bottom: 1.5rem;
             }
-
-            footer {
-                break-inside: avoid;
-            }
         }
 
         @media screen {
-            .sidebar-fixed {
-                position: fixed;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 320px;
-                z-index: 50;
-            }
             .main-content {
-                margin-left: 320px;
-                background-color: #f3f4f6;
-                min-height: 100vh;
-                padding: 40px 20px;
+                padding: 20px;
                 display: flex;
-                justify-content: center;
+                flex-direction: column;
+                align-items: center;
+                min-height: 100vh;
             }
+
             #worksheet {
                 box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
                 width: 210mm;
                 min-height: 297mm;
                 background: white;
+                transform-origin: top center;
+                margin-top: 20px;
+            }
+            
+            /* Responsive Scaling for Mobile Preview */
+            @media (max-width: 850px) {
+                #worksheet {
+                    transform: scale(0.45);
+                    margin-bottom: -160mm;
+                }
+            }
+            @media (max-width: 500px) {
+                #worksheet {
+                    transform: scale(0.35);
+                    margin-bottom: -190mm;
+                }
             }
         }
 
@@ -97,84 +100,85 @@
         .ans-space-bahagi { height: 130px; }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-    <!-- Sidebar -->
-    <aside class="sidebar-fixed bg-white p-6 no-print overflow-y-auto hidden md:block border-r border-gray-200">
-        <div class="flex items-center gap-2 mb-8 text-blue-600">
-            <i class="fas fa-calculator text-3xl"></i>
-            <h1 class="text-2xl font-bold tracking-tight">MathGenius</h1>
-        </div>
-
-        <div class="space-y-6">
-            <section>
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">1. Operasi Asas</label>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="setOp('tambah')" class="op-btn p-3 rounded-xl border-2 flex flex-col items-center gap-1 hover:bg-blue-50 transition border-blue-600 bg-blue-50" id="btn-tambah">
-                        <i class="fas fa-plus text-blue-600"></i><span class="text-xs font-bold text-blue-700">Tambah</span>
-                    </button>
-                    <button onclick="setOp('tolak')" class="op-btn p-3 rounded-xl border-2 flex flex-col items-center gap-1 hover:bg-blue-50 transition border-gray-200" id="btn-tolak">
-                        <i class="fas fa-minus text-gray-500"></i><span class="text-xs text-gray-600">Tolak</span>
-                    </button>
-                    <button onclick="setOp('darab')" class="op-btn p-3 rounded-xl border-2 flex flex-col items-center gap-1 hover:bg-blue-50 transition border-gray-200" id="btn-darab">
-                        <i class="fas fa-times text-gray-500"></i><span class="text-xs text-gray-600">Darab</span>
-                    </button>
-                    <button onclick="setOp('bahagi')" class="op-btn p-3 rounded-xl border-2 flex flex-col items-center gap-1 hover:bg-blue-50 transition border-gray-200" id="btn-bahagi">
-                        <i class="fas fa-divide text-gray-500"></i><span class="text-xs text-gray-600">Bahagi</span>
-                    </button>
+    <!-- Header & Controls (Top Layout) -->
+    <header class="no-print bg-white border-b sticky top-0 z-50 shadow-sm w-full">
+        <div class="max-w-6xl mx-auto p-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+                <div class="flex items-center gap-2 text-blue-600">
+                    <i class="fas fa-calculator text-2xl"></i>
+                    <h1 class="text-xl font-bold tracking-tight">MathGenius</h1>
                 </div>
-            </section>
+            </div>
 
-            <section>
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">2. Lingkungan Nombor</label>
-                <select id="rangeSelect" class="w-full border-2 border-gray-100 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition" onchange="generateWorksheet()">
-                    <option value="100">Hingga 100 (2 Digit)</option>
-                    <option value="1000">Hingga 1,000 (3 Digit)</option>
-                    <option value="10000">Hingga 10,000 (4 Digit)</option>
-                    <option value="100000">Hingga 100,000 (5 Digit)</option>
-                    <option value="1000000">Hingga 1,000,000 (6 Digit)</option>
-                </select>
-            </section>
+            <!-- Controls Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <!-- Operation -->
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">1. Operasi</label>
+                    <div class="flex gap-1">
+                        <button onclick="setOp('tambah')" id="btn-tambah" class="op-btn flex-1 p-2 rounded-lg border-2 border-blue-600 bg-blue-50 text-blue-600 transition"><i class="fas fa-plus"></i></button>
+                        <button onclick="setOp('tolak')" id="btn-tolak" class="op-btn flex-1 p-2 rounded-lg border-2 border-gray-200 text-gray-400 transition"><i class="fas fa-minus"></i></button>
+                        <button onclick="setOp('darab')" id="btn-darab" class="op-btn flex-1 p-2 rounded-lg border-2 border-gray-200 text-gray-400 transition"><i class="fas fa-times"></i></button>
+                        <button onclick="setOp('bahagi')" id="btn-bahagi" class="op-btn flex-1 p-2 rounded-lg border-2 border-gray-200 text-gray-400 transition"><i class="fas fa-divide"></i></button>
+                    </div>
+                </div>
 
-            <section id="optionSection">
-                <label id="optionLabel" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">3. Teknik Pengiraan</label>
-                <select id="regroupSelect" class="w-full border-2 border-gray-100 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition" onchange="generateWorksheet()">
-                    <option value="yes">Dengan Mengumpul Semula</option>
-                    <option value="no">Tanpa Mengumpul Semula</option>
-                </select>
-            </section>
+                <!-- Range -->
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">2. Lingkungan</label>
+                    <select id="rangeSelect" class="w-full border rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" onchange="generateWorksheet()">
+                        <option value="100">Hingga 100</option>
+                        <option value="1000">Hingga 1,000</option>
+                        <option value="10000">Hingga 10,000</option>
+                        <option value="100000">Hingga 100,000</option>
+                        <option value="1000000">Hingga 1,000,000</option>
+                    </select>
+                </div>
 
-            <section>
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">4. Bilangan Soalan</label>
-                <select id="numQuestions" class="w-full border-2 border-gray-100 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none transition" onchange="generateWorksheet()">
-                    <option value="10">10 Soalan</option>
-                    <option value="15">15 Soalan</option>
-                    <option value="20" selected>20 Soalan</option>
-                    <option value="30">30 Soalan</option>
-                </select>
-            </section>
+                <!-- Technique -->
+                <div>
+                    <label id="optionLabel" class="block text-[10px] font-bold text-gray-400 uppercase mb-2">3. Teknik</label>
+                    <select id="regroupSelect" class="w-full border rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" onchange="generateWorksheet()">
+                        <option value="yes">Kumpul Semula</option>
+                        <option value="no">Tanpa Kumpul</option>
+                    </select>
+                </div>
 
-            <div class="space-y-3 pt-4 border-t border-gray-100">
-                <button onclick="generateWorksheet()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 active:scale-95 transition flex items-center justify-center gap-2">
-                    <i class="fas fa-sync-alt"></i> Jana Soalan
+                <!-- Count -->
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">4. Bilangan</label>
+                    <select id="numQuestions" class="w-full border rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" onchange="generateWorksheet()">
+                        <option value="10">10 Soalan</option>
+                        <option value="15">15 Soalan</option>
+                        <option value="20" selected>20 Soalan</option>
+                        <option value="30">30 Soalan</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Buttons (Moved to Bottom of Panel) -->
+            <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                <button onclick="generateWorksheet()" class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-700 active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-sync-alt"></i> Jana Soalan Baru
                 </button>
-
-                <button onclick="window.print()" class="w-full bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-emerald-600 active:scale-95 transition flex items-center justify-center gap-2">
-                    <i class="fas fa-print"></i> Cetak ke PDF
+                <button onclick="handlePrint()" class="flex-1 bg-emerald-500 text-white px-4 py-3 rounded-lg font-bold hover:bg-emerald-600 active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-print"></i> Cetak Lembaran (PDF)
                 </button>
             </div>
         </div>
-    </aside>
+    </header>
 
     <main class="main-content">
         <div id="worksheet" class="p-12 print-area flex flex-col">
             <header class="border-b-2 border-black pb-6 mb-10">
                 <h2 id="sheetTitle" class="text-3xl font-bold uppercase tracking-tighter text-center w-full mb-6">MANTAP OPERASI ASAS</h2>
-                <div class="grid grid-cols-2 gap-x-12 gap-y-4 text-sm font-bold text-black">
-                    <div class="flex gap-2">NAMA: <span class="border-b border-black flex-1 font-normal min-w-[200px]"></span></div>
-                    <div class="flex gap-2">TARIKH: <span class="border-b border-black flex-1 font-normal min-w-[100px]"></span></div>
-                    <div class="flex gap-2">KELAS: <span class="border-b border-black flex-1 font-normal min-w-[200px]"></span></div>
-                    <div class="flex gap-2">MARKAH: <span class="border-b border-black flex-1 font-normal min-w-[100px]"></span></div>
+                <div class="grid grid-cols-2 gap-x-12 gap-y-4 text-sm font-bold text-black text-left">
+                    <div class="flex gap-2 whitespace-nowrap">NAMA: <span class="border-b border-black flex-1 min-w-[100px]"></span></div>
+                    <div class="flex gap-2 whitespace-nowrap">TARIKH: <span class="border-b border-black flex-1 min-w-[100px]"></span></div>
+                    <div class="flex gap-2 whitespace-nowrap">KELAS: <span class="border-b border-black flex-1 min-w-[100px]"></span></div>
+                    <div class="flex gap-2 whitespace-nowrap">MARKAH: <span class="border-b border-black flex-1 min-w-[100px]"></span></div>
                 </div>
             </header>
 
@@ -187,7 +191,7 @@
                     </p>
                     <div class="mt-2 flex justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">
                         <span>© CikguNorlySKSE</span>
-                        <span>MathGenius v2.0</span>
+                        <span>MathGenius v2.2</span>
                     </div>
                 </div>
             </footer>
@@ -198,26 +202,27 @@
         let currentOp = 'tambah';
 
         function formatNum(num) {
-            // Menggantikan tanda koma dengan jarak kosong (space)
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        // Improved Print Handler for Mobile
+        function handlePrint() {
+            // Give a tiny delay to ensure DOM is ready and any keyboard is closed on mobile
+            setTimeout(() => {
+                window.print();
+            }, 250);
         }
 
         function setOp(op) {
             currentOp = op;
             document.querySelectorAll('.op-btn').forEach(btn => {
-                btn.classList.remove('border-blue-600', 'bg-blue-50');
-                btn.classList.add('border-gray-200');
-                btn.querySelector('span').classList.remove('font-bold', 'text-blue-700');
-                btn.querySelector('span').classList.add('text-gray-600');
-                btn.querySelector('i').classList.remove('text-blue-600');
-                btn.querySelector('i').classList.add('text-gray-500');
+                btn.classList.remove('border-blue-600', 'bg-blue-50', 'text-blue-600');
+                btn.classList.add('border-gray-200', 'text-gray-400');
             });
 
             const activeBtn = document.getElementById(`btn-${op}`);
-            activeBtn.classList.remove('border-gray-200');
-            activeBtn.classList.add('border-blue-600', 'bg-blue-50');
-            activeBtn.querySelector('span').classList.add('font-bold', 'text-blue-700');
-            activeBtn.querySelector('i').classList.add('text-blue-600');
+            activeBtn.classList.remove('border-gray-200', 'text-gray-400');
+            activeBtn.classList.add('border-blue-600', 'bg-blue-50', 'text-blue-600');
             
             const optionLabel = document.getElementById('optionLabel');
             const regroupSelect = document.getElementById('regroupSelect');
@@ -225,15 +230,15 @@
             if (optionLabel && regroupSelect) {
                 regroupSelect.innerHTML = '';
                 if (op === 'darab' || op === 'bahagi') {
-                    optionLabel.innerText = "3. Pilih Digit Pendarab/Pembahagi";
+                    optionLabel.innerText = "3. Digit Pendarab";
                     const opt1 = new Option("1 Digit", "1digit");
                     const opt2 = new Option("2 Digit", "2digit");
                     regroupSelect.add(opt1);
                     regroupSelect.add(opt2);
                 } else {
-                    optionLabel.innerText = "3. Teknik Pengiraan";
-                    const opt1 = new Option("Dengan Mengumpul Semula", "yes");
-                    const opt2 = new Option("Tanpa Mengumpul Semula", "no");
+                    optionLabel.innerText = "3. Teknik";
+                    const opt1 = new Option("Kumpul Semula", "yes");
+                    const opt2 = new Option("Tanpa Kumpul", "no");
                     regroupSelect.add(opt1);
                     regroupSelect.add(opt2);
                 }
@@ -261,7 +266,7 @@
                 qBox.className = `question-box p-4 border border-gray-100 rounded-lg flex flex-col items-center justify-start relative ${minH}`;
                 
                 let html = `<div class="absolute top-1 left-2 text-[11px] font-bold text-gray-400 no-print">#${i}</div>`;
-                html += `<div class="vertical-math mt-2 font-mono">`;
+                html += `<div class="vertical-math mt-2 font-mono text-black">`;
                 
                 if (currentOp === 'bahagi') {
                     html += `<div class="flex items-end pr-1 mb-2 font-bold"><span class="mr-2 mb-1 text-lg">${formatNum(q.num2)}</span><div class="border-l-4 border-t-4 border-black p-2 px-4 min-w-[100px] text-right text-xl">${formatNum(q.num1)}</div></div><div class="ans-space-bahagi"></div>`;
